@@ -32,61 +32,38 @@
 
 # ------------------------------------------------------------------------------------
 
-
 library(d3heatmap)
 library(shiny)
 library(RColorBrewer)
-
-pwd<-"C:/Users/James.JAMES/Desktop/Microscope-master/genes_file.csv"
-genes<-read.csv(pwd, header= TRUE, sep=",", quote= '"',row.names=1)
-genes.numeric <- data.matrix(genes)
+library(colorspace)
 
 
-shinyUI(pageWithSidebar(
+# preprocessing
+#pwd<-"C:/Users/James.JAMES/Documents/MICROSCOPE/genes_file.csv"
+#genes<-read.csv(pwd, header= TRUE, sep=",", quote= '"',row.names=1)
+#genes.numeric <- data.matrix(genes)
+
+
+# frontend
+ui <- shinyUI(pageWithSidebar(
   headerPanel("MicroScope"),
   sidebarPanel(
-    fileInput('file1', 'Choose CSV File',
-              accept=c('text/csv', 'text/comma-separated-values,text/plain', '.csv')),
-    tags$hr(),
-    checkboxInput('header', 'Header', TRUE),
-    radioButtons('sep', 'Separator',
-                 c(Comma=',',
-                   Semicolon=';',
-                   Tab='\t'),
-                 ','),
 
-    br(),
-    
+    	fileInput("filename", "Choose file to upload", accept = c('text/csv', 'text/comma-separated-values', 'text/tab-separated-values', 'text/plain', '.csv', '.tsv')),	#this works without problems
+  		selectInput("choose", "Choose Color Scheme:", c("YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds", "RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd", "Oranges", "Greys", "Greens", "GnBu", "BuPu", "BuGn", "Blues")),
+		checkboxInput("cluster", "Apply clustering"),
+		  	
+  			radioButtons('quote', 'Quote',
+               c(None='',
+                 'Double Quote'='"',
+                 'Single Quote'="'"),
+               '"')
+               ),
 
-    radioButtons('quote', 'Quote',
-                 c(None='',
-                   'Double Quote'='"',
-                   'Single Quote'="'"),
-                 '"'),
-    radioButtons('color', 'Colors',
-                 c(Blue ='Blues',
-                   Greens='Greens'),
-                 'Blues'),
-    radioButtons('percentage', 'Percentage',
-                 c(None='',
-                   topOne ='.01',
-                   topFive='.05',
-                   topTen='.1'),
-                 'none'),
-    textInput("text", label=h3("Text Input"), value="enter Speciman...")
+  mainPanel(d3heatmapOutput("heatmap", width = "800px", height = "800px"))		#must use mainPanel() environment when using shinyUI environment
 
-  ),
-    
-  
-  
-  mainPanel(
-	tabsetPanel(
-	
-	type="tabs",
-	
-	tabPanel("Interactive! Heatmap", d3heatmap(genes.numeric, dendrogram ="row", color= colorRamp(c("green", "black", "red"), space = "rgb"), width = "150%", height = "1000px", cexRow=0.5)),
-	
-	tabPanel("Instructions",textInput("text", label=h3("Click-and-drag to zoom in. Click-once to zoom out."), value="It's that easy!"))
 )
 )
-  ))
+
+
+
